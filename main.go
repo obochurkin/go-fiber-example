@@ -9,14 +9,17 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
-	"github.com/gofiber/fiber/v2/middleware/etag"
-	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/joho/godotenv"
 
+	"github.com/obochurkin/go-fiber-example/config"
+	"github.com/obochurkin/go-fiber-example/database"
 	"github.com/obochurkin/go-fiber-example/router"
 )
 
@@ -35,7 +38,11 @@ func main() {
 	app.Use(etag.New())
 	app.Use(compress.New())
 
-	// TODO: add DB connection
+	if err := godotenv.Load(".env"); err != nil {
+		panic("Error loading .env file")
+	}
+
+	database.Connect()
 
 	// Init Routes
 	router.InitRoutes(app)
@@ -44,7 +51,7 @@ func main() {
 
 	// Graceful shutdown
 	go func() {
-		if err := app.Listen(":4003"); err != nil {
+		if err := app.Listen(config.GetEnvVariable("PORT")); err != nil {
 			log.Panic(err)
 		}
 	}()
