@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: go-fiber-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: go_fiber_db_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - go-fiber-network
+
+  app:
+    build: .
+    container_name: go-fiber-app
+    restart: unless-stopped
+    ports:
+      - "4003:4003"
+    depends_on:
+      - postgres
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=go_fiber_db_dev
+    networks:
+      - go-fiber-network
+
+volumes:
+  postgres_data:
+
+networks:
+  go-fiber-network:
+    driver: bridge

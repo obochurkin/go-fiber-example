@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/obochurkin/go-fiber-example/handlers"
+	"github.com/obochurkin/go-fiber-example/middlewares"
 )
 
 func InitRoutes(app *fiber.App) {
@@ -10,20 +11,13 @@ func InitRoutes(app *fiber.App) {
 
 	v1 := api.Group("/v1")
 
+	//Init Controllers
+	userController := &handlers.UserController{}
+
 	v1.Route("/users", func(v1 fiber.Router) {
-		v1.Get("/", handlers.GetUsers)
-		v1.Post("/", func(c *fiber.Ctx) error {
-			type User struct {
-				Email    string `json:"email"`
-				Password string `json:"password"`
-			}
-			p := new(User)
 
-			if err := c.BodyParser(p); err != nil {
-				return err
-			}
-
-			return c.SendStatus(fiber.StatusCreated)
-		})
+		v1.Get("/", userController.GetUsers)
+		v1.Get("/:id", middlewares.ValidateIdParam(), userController.GetUserById)
+		v1.Post("/register", userController.CreateUser)
 	})
 }
