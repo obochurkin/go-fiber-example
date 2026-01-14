@@ -17,6 +17,7 @@ func(ur *UsersRepository) FindAll() ([]models.User, error) {
 	return users, nil
 }
 
+// Find user by ID
 func(ur *UsersRepository) FindByID(id uint) (models.User, error) {
 	user := models.User{}
 	if err := database.Instance.DB.First(&user, id).Error; err != nil {
@@ -25,6 +26,7 @@ func(ur *UsersRepository) FindByID(id uint) (models.User, error) {
 	return user, nil
 }
 
+// Create a new user
 func(ur *UsersRepository) Create(user dtos.CreateUserDTO, salt string) error {
 	newUser := models.User{
 		Email:    user.Email,
@@ -40,12 +42,23 @@ func(ur *UsersRepository) Create(user dtos.CreateUserDTO, salt string) error {
 	return nil
 }
 
-func(ur *UsersRepository) FindByEmail(email string) (int64, error) {
+// Check if email already exists
+func(ur *UsersRepository) IsEmailExists(email string) (int64, error) {
 	count := int64(0)
 	if err := database.Instance.DB.Table("users").Where("email = ?", email).Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return count, nil
+}
+
+// Get one user by email
+func(ur *UsersRepository) GetOneUserByEmail(email string) (models.User, error) {
+	user := models.User{}
+	if err := database.Instance.DB.Where("email = ?", email).First(&user).Error; err !=nil {
+		return models.User{}, errors.NotFoundError()
+	}
+
+	return user, nil
 }
 
 func(ur *UsersRepository) Update(user interface{}) {}

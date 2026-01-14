@@ -39,7 +39,7 @@ func (uc *UserController) CreateUser(c *fiber.Ctx) error {
 		return errors.BadRequestError()
 	}
 
-	count ,err := usersRepository.FindByEmail(userInput.Email)
+	count ,err := usersRepository.IsEmailExists(userInput.Email)
 	if err != nil {
 		log.Errorf("Error checking existing email: %v", err)
 		return errors.InternalError()
