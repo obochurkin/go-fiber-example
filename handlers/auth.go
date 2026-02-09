@@ -103,7 +103,7 @@ func (auth *AuthController) Login(c *fiber.Ctx) error {
 		Value:    tokenString,
 		HTTPOnly: true,
 		Secure:   true,
-		SameSite: "Lax", 
+		SameSite: "None", 
 		MaxAge:   3600,  // 1 hour
 	}
 
